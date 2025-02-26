@@ -1,5 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using MongoDB.EntityFrameworkCore.Extensions;
+using MongoDB.Driver;
 using NewMicroservice.Catalog.Api.Features.Categories;
 using NewMicroservice.Catalog.Api.Features.Courses;
 using System.Reflection;
@@ -10,6 +10,14 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
 {
     public DbSet<Course> Courses { get; set; }
     public DbSet<Category> Categories { get; set; }
+
+    public static AppDbContext Create(IMongoDatabase database)
+    {
+        var optionsBuilder = new DbContextOptionsBuilder<AppDbContext>()
+            .UseMongoDB(database.Client, database.DatabaseNamespace.DatabaseName);
+
+        return new AppDbContext(optionsBuilder.Options);
+    }
 
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
